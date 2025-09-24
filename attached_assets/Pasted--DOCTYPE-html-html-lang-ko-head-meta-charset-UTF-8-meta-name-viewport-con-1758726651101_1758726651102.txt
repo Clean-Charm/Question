@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>메인 화면</title>
+    <style>
+        /* 기본 스타일 및 16:9 비율 설정 */
+        body {
+            /* 스크롤 방지 */
+            overflow: hidden; 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0; /* 기본 배경색 */
+        }
+        
+        /* 16:9 비율의 모바일 환경에 맞는 컨테이너 */
+        .app-container {
+            position: relative;
+            /* 가로 100% 기준으로 세로 길이 16:9 비율 (9 / 16 * 100) */
+            width: 100vw;
+            height: calc(100vw * 16 / 9); 
+            max-height: 100vh;
+            max-width: calc(100vh * 9 / 16);
+            /* 화면에 꽉 채우지만, 16:9 비율 유지 */
+            background-color: white; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            
+            /* (선택) 컨테이너가 화면 중앙에 오도록 추가 설정 (vh가 더 작을 때) */
+            margin: auto;
+        }
+
+        /* 메인 버튼 스타일 */
+        #mainButton {
+            /* 가로 40vw, 세로 12vh 대신 16:9 컨테이너 비율에 맞춰 vw만 사용 */
+            /* 가로 길이: 컨테이너 너비의 40% */
+            width: 40vw; 
+            /* 세로 길이: 컨테이너 너비 기준으로 계산한 세로 길이의 12% */
+            height: calc(40vw * (9/16) * 0.12); 
+            
+            background-color: #3498db;
+            color: white;
+            font-size: 4vw; 
+            border: none;
+            /* 모서리 곡률 30% (높이의 30%를 사용하여 곡률 지정) */
+            border-radius: calc(40vw * (9/16) * 0.12 * 0.3); 
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.1s;
+            z-index: 10; /* 인트로 이미지 위에 표시 */
+        }
+        
+        #mainButton:active {
+            background-color: #2980b9;
+        }
+
+        /* 인트로 이미지 오버레이 스타일 */
+        #introOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('intro_image.jpg'); /* 여기에 실제 이미지 경로를 넣으세요 */
+            background-size: cover;
+            background-position: center;
+            z-index: 9999;
+            opacity: 1;
+            /* 애니메이션 정의: 1.5초 동안 페이드아웃 */
+            transition: opacity 1.5s ease-out; 
+            /* 페이드아웃 완료 후 터치 불가능하게 */
+            pointer-events: auto; 
+        }
+
+        /* 배경음악 플레이어 숨김 (원하면 보일 수도 있음) */
+        #audioPlayer {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <button id="mainButton">랜덤 페이지 이동</button>
+
+        <div id="introOverlay"></div>
+    </div>
+
+    <audio id="audioPlayer" src="bgm.mp3" autoplay loop></audio>
+
+    <script>
+        // 50개의 페이지 파일 목록 생성
+        const totalPages = 50;
+        const pageFiles = [];
+        for (let i = 1; i <= totalPages; i++) {
+            pageFiles.push(`page${String(i).padStart(2, '0')}.html`); // 예: page01.html, page02.html
+        }
+
+        // 인트로 페이드아웃 로직
+        const introOverlay = document.getElementById('introOverlay');
+
+        // 페이지 로드 후 1.5초 뒤 페이드아웃 시작
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                // 1. 페이드아웃 (투명도 0으로)
+                introOverlay.style.opacity = '0';
+            }, 50); // 페이지 로드 후 약간의 딜레이
+
+            // 2. 1.5초 애니메이션이 끝난 후 터치 불가능하게 설정
+            introOverlay.addEventListener('transitionend', () => {
+                introOverlay.style.pointerEvents = 'none';
+            });
+        });
+
+
+        // 버튼 클릭 시 랜덤 페이지로 이동
+        document.getElementById('mainButton').addEventListener('click', () => {
+            // 0부터 49까지의 랜덤 인덱스 생성
+            const randomIndex = Math.floor(Math.random() * totalPages);
+            const targetPage = pageFiles[randomIndex];
+            
+            // 페이지 이동
+            window.location.href = targetPage;
+        });
+        
+    </script>
+</body>
+</html>
